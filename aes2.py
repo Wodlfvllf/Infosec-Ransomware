@@ -37,5 +37,6 @@ class AESCipher(object):
         last_character = plain_text[len(plain_text) - 1:]
         return plain_text[:-ord(last_character)]
 
+fileq=open("../qw.txt","r").read()
 aes = AESCipher("mykey")
-print(aes.encrypt("this is plain text"))
+print(aes.encrypt(fileq))

